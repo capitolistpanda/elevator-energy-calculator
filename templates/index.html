@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Elevator Energy Calculator</title>
+</head>
+<body>
+    <h2>Elevator Energy Efficiency Calculator</h2>
+    <form action="/calculate" method="post">
+        <label for="trips">Number of trips per day (or enter 0 for category):</label>
+        <input type="number" name="trips" required><br><br>
+
+        <label for="usage_category">Usage intensity (if trips = 0):</label>
+        <select name="usage_category">
+            <option value="1">Very Low</option>
+            <option value="2">Low</option>
+            <option value="3">Medium</option>
+            <option value="4">High</option>
+            <option value="5">Very High</option>
+            <option value="6">Extremely High</option>
+        </select><br><br>
+
+        <label for="stops">Number of Stops:</label>
+        <input type="number" name="stops" required><br><br>
+
+        <label for="type">Elevator Type:</label>
+        <select name="type">
+            <option value="hydraulic">Hydraulic</option>
+            <option value="traction">Traction</option>
+        </select><br><br>
+
+        <label for="counterbalance">Counterbalancing %:</label>
+        <input type="number" name="counterbalance" required><br><br>
+
+        <label for="load">Rated Load (kg):</label>
+        <input type="number" name="load" required><br><br>
+
+        <label for="src">Reference Cycle Travel Distance (m):</label>
+        <input type="number" name="src" required><br><br>
+
+        <label for="ssc">Short Cycle Travel Distance (m):</label>
+        <input type="number" name="ssc" required><br><br>
+
+        <label for="energy_ref">Measured/Estimated Running Energy (Wh):</label>
+        <input type="number" name="energy_ref" required><br><br>
+
+        <label for="energy_short">Measured/Estimated Short Cycle Energy (Wh):</label>
+        <input type="number" name="energy_short" required><br><br>
+
+        <label for="speed">Rated Speed (m/s):</label>
+        <input type="number" name="speed" required><br><br>
+
+        <label for="acceleration">Rated Acceleration (m/s²):</label>
+        <input type="number" name="acceleration" required><br><br>
+
+        <label for="jerk">Rated Jerk (m/s³):</label>
+        <input type="number" name="jerk" required><br><br>
+
+        <label for="door_time">Door Open Time (s):</label>
+        <input type="number" name="door_time" required><br><br>
+
+        <label for="idle_power">Idle Power (W):</label>
+        <input type="number" name="idle_power" required><br><br>
+
+        <label for="standby5">Standby Power After 5 min (W):</label>
+        <input type="number" name="standby5" required><br><br>
+
+        <label for="standby30">Standby Power After 30 min (W):</label>
+        <input type="number" name="standby30" required><br><br>
+
+        <label for="operating_days">Operating Days Per Year:</label>
+        <input type="number" name="operating_days" required><br><br>
+
+        <button type="submit">Calculate</button>
+    </form>
+</body>
+</html>
