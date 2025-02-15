@@ -8,7 +8,28 @@ def get_db():
     db = getattr(g, '_database', None)
     if db is None:
         db = g._database = sqlite3.connect(DATABASE)
+        db.execute('PRAGMA foreign_keys = ON')  # Ensure foreign keys are enabled
     return db
+
+def init_db():
+    with app.app_context():
+        db = get_db()
+        cursor = db.cursor()
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS calculations (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                trips INTEGER NOT NULL,
+                energy_consumption REAL NOT NULL
+            )
+        ''')
+        db.commit()
+        cursor.close()  # Close the cursor
+
+@app.teardown_appcontext
+def close_db(exception):
+    db = getattr(g, '_database', None)
+    if db is not None:
+        db.close()  # Ensure database is properly closed
 
 def calculate_energy(nd, uc, ns, type, cb, rl, src, ssc, xpzone, sez, sfl, Erc, Esc, v, a, j, td, Pid, Pst5, Pst30, dop):
     usage_categories = {
