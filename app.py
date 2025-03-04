@@ -6,6 +6,7 @@ DATABASE = 'elevator_data.db'
 
 
 def get_db():
+    """ Establish database connection and ensure foreign keys are enabled. """
     db = getattr(g, '_database', None)
     if db is None:
         db = g._database = sqlite3.connect(DATABASE)
@@ -14,14 +15,15 @@ def get_db():
 
 
 def init_db():
+    """ Initialize the database if it does not exist. """
     with app.app_context():
         db = get_db()
         cursor = db.cursor()
         cursor.execute('''
             CREATE TABLE IF NOT EXISTS calculations (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
-                trips INTEGER NOT NULL,
-                energy_consumption REAL NOT NULL
+                daily_energy REAL NOT NULL,
+                yearly_energy REAL NOT NULL
             )
         ''')
         db.commit()
@@ -30,6 +32,7 @@ def init_db():
 
 @app.teardown_appcontext
 def close_db(exception):
+    """ Ensure database connection is closed after request. """
     db = getattr(g, '_database', None)
     if db is not None:
         db.close()
@@ -48,7 +51,7 @@ def calculate_energy(trips, usage_category, stops, type, counterbalance, load, s
     }
 
     if nd == 0:
-        nd, Rid, Rst5, Rst30 = usage_categories[usage_category]
+        nd, Rid, Rst5, Rst30 = usage_categories.get(usage_category, usage_categories[3])  # Default to category 3 if missing
     else:
         Rid, Rst5, Rst30 = usage_categories[min(usage_categories.keys(), key=lambda x: abs(x - nd))][1:]
 
@@ -80,16 +83,17 @@ def calculate_energy(trips, usage_category, stops, type, counterbalance, load, s
 
 @app.route('/')
 def index():
-    """Render the homepage with past results."""
+    """ Render home page with past calculations. """
     db = get_db()
-    cur = db.execute('SELECT * FROM calculations ORDER BY id DESC LIMIT 5')
-    past_results = cur.fetchall()
+    with db:
+        cur = db.execute('SELECT * FROM calculations ORDER BY id DESC LIMIT 5')
+        past_results = cur.fetchall()
     return render_template('index.html', past_results=past_results)
 
 
 @app.route('/calculate', methods=['POST'])
 def calculate():
-    """Handle the calculation request and save results."""
+    """ Handle form submission and perform calculations. """
     data = {}
 
     for key in request.form:
@@ -114,7 +118,7 @@ def calculate():
 
     # Insert results into the database
     db = get_db()
-    db.execute('INSERT INTO calculations (trips, energy_consumption) VALUES (?, ?)', (data.get('trips', 0), Ed))
+    db.execute('INSERT INTO calculations (daily_energy, yearly_energy) VALUES (?, ?)', (Ed, Ey))
     db.commit()
 
     # Return the calculated values to the template
@@ -122,5 +126,5 @@ def calculate():
 
 
 if __name__ == '__main__':
-    init_db()  # Ensure the database is initialized
+    init_db()  # Ensure database is initialized before running
     app.run(debug=True)
