@@ -126,5 +126,6 @@ def calculate():
 
 
 if __name__ == '__main__':
-    init_db()  # Ensure database is initialized before running
+    with app.app_context():
+        init_db()  # Ensures database and table exist before running
     app.run(debug=True)
