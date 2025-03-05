@@ -19,13 +19,14 @@ def init_db():
     with app.app_context():
         db = get_db()
         cursor = db.cursor()
-        cursor.execute('''
-            CREATE TABLE IF NOT EXISTS calculations (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                daily_energy REAL NOT NULL,
-                yearly_energy REAL NOT NULL
-            )
-        ''')
+	cursor.execute("DROP TABLE IF EXISTS calculations")  # Delete old table
+	cursor.execute('''
+  	  CREATE TABLE calculations (
+   	     id INTEGER PRIMARY KEY AUTOINCREMENT,
+  	      daily_energy REAL NOT NULL,
+  	      yearly_energy REAL NOT NULL
+ 	   )
+	''')
         db.commit()
         cursor.close()
 
