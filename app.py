@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request, g
 import sqlite3
+import os
 
 app = Flask(__name__)
 DATABASE = 'elevator_data.db'
@@ -14,19 +15,27 @@ def get_db():
     return db
 
 
+def reset_database():
+    """ Completely delete the old database file and reset it """
+    if os.path.exists(DATABASE):
+        os.remove(DATABASE)
+    init_db()
+
+
 def init_db():
-    """ Initialize the database if it does not exist. """
+    """ Create a fresh database with the correct table structure. """
     with app.app_context():
         db = get_db()
         cursor = db.cursor()
-        cursor.execute("DROP TABLE IF EXISTS calculations")  # Delete old table
+        
         cursor.execute('''
-            CREATE TABLE calculations (
+            CREATE TABLE IF NOT EXISTS calculations (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 daily_energy REAL NOT NULL,
                 yearly_energy REAL NOT NULL
             )
         ''')
+        
         db.commit()
         cursor.close()
 
@@ -128,5 +137,5 @@ def calculate():
 
 if __name__ == '__main__':
     with app.app_context():
-        init_db()  # Ensures database and table exist before running
+        reset_database()  # Forces database reset every time the app starts.
     app.run(debug=True)
